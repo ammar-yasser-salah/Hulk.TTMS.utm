@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TTMS-Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="Login.css">
+</head>
+
+<body>
+    <div class="login-container w3-card-4">
+        <div class="logo-wrapper">
+            <img src="UTM-LOGO-FULL.png" alt="UTM Logo" class="utm-logo">
+        </div>
+        <div class="login-title">Sign in</div>
+
+        <div class="input-group">
+            <label for="login">Username</label>
+            <input type="text" id="login" placeholder="Username">
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Password">
+            <div class="password-toggle" id="togglePassword">
+                <i class="far fa-eye"></i>
+                <span>Hide</span>
+            </div>
+        </div>
+    
+
+        <button class="login-btn" id="btnLogin">Login</button>
+
+        <div id="alertMessage" class="alert-box"></div>
+    </div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $("#togglePassword").click(function() {
+        const password = $("#password");
+        const icon = $(this).find("i");
+        const span = $(this).find("span");
+
+        if (password.attr("type") === "password") {
+            password.attr("type", "text");
+            icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            span.text("Show");
+        } else {
+            password.attr("type", "password");
+            icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            span.text("Hide");
+        }
+    });
+
+    // Show alert message in box
+    function showAlertMessage(message, isSuccess) {
+        const alertBox = $("#alertMessage");
+        alertBox.removeClass("alert-success alert-error");
+        alertBox.addClass(isSuccess ? "alert-success" : "alert-error");
+        alertBox.text(message);
+        alertBox.fadeIn();
+
+        setTimeout(() => {
+            alertBox.fadeOut();
+        }, 4000);
+    }
+
+    $("#btnLogin").click(function() {
+        const username = $("#login").val();
+        const password = $("#password").val();
+
+        const url = "http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication&login=" + username + "&password=" + password;
+
+        fetch(url)
+        .then(res => res.json())
+        .then(jsonInst => {
+            showAlertMessage("Success login to the system!", true);
+            localStorage.setItem("web.fc.utm.my_usersession", JSON.stringify(jsonInst[0]));
+            //USED TO PASS username TO COURSES
+            localStorage.setItem("loggedUsername", username);
+            setTimeout(() => {
+                window.location.replace("ttms-main.html");
+            }, 1500);
+        })
+        .catch(err => {
+            showAlertMessage("Invalid Username or Password!", false);
+            console.log(err);
+        });
+    });
+
+    $("#password").keypress(function(e) {
+        if (e.which === 13) {
+            $("#btnLogin").click();
+        }
+    });
+</script>
+</html>

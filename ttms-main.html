@@ -1,0 +1,433 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <title>TTMS - Main</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="Main.css">
+    </head>
+
+    <body>
+    <div id="app">
+        <!-- Sidebar -->
+        <div class="sidebar" :class="{ collapsed: sidebarCollapsed }" id="sidebar">
+        <div style="padding: 0 15px 15px 15px;">
+            <button class="toggle-btn" @click="toggleSidebar">
+            <i :class="sidebarCollapsed ? 'fas fa-bars' : 'fas fa-times'"></i>
+            </button>
+        </div>
+        <a class="link" @click="currentView = 'profile'">
+            <i class="fas fa-user"></i> <span class="menu-text">Profile</span>
+        </a>
+        <a class="link" @click="currentView = 'timetable'">
+            <i class="fas fa-calendar-alt"></i> <span class="menu-text">Timetable</span>
+        </a>
+        <a class="link" @click="currentView = 'courses'">
+            <i class="fas fa-book"></i> <span class="menu-text">Courses</span>
+        </a>
+        <a class="link" @click="logout">
+            <i class="fas fa-sign-out-alt"></i> <span class="menu-text">Logout</span>
+        </a>
+        </div>
+
+        <!-- Header -->
+        <div class="header" :class="{ expanded: sidebarCollapsed }">
+          <img src="UTM-LOGO-FULL.png" alt="UTM FC Logo" style="max-height: 50px;">
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" :class="{ expanded: sidebarCollapsed }">
+        <component :is="currentView"></component>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer" :class="{ expanded: sidebarCollapsed }">
+        Footer
+        </div>
+    </div>
+
+    <script>
+        const CoursesComponent = {
+    template: `
+        <div id="myApp">
+        <input type="hidden" id="username">
+
+        <!-- Filters -->
+        <div style="margin-bottom: 20px;">
+        <label for="year">Year:</label>
+        <select v-model="selectedYear" id="year">
+            <option value="">All</option>
+            <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+        </select>
+
+        <label for="semester">Semester:</label>
+        <select v-model="selectedSemester" id="semester">
+            <option value="">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+        </select>
+        </div>
+
+        <!-- Filtered Course List -->
+        <div v-for="(courses, semSession) in filteredCourses" :key="semSession">
+        <h2>{{ semSession }}</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Section</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(course, index) in courses" :key="index">
+                <td>{{ course.kod_subjek }}</td>
+                <td>{{ course.nama_subjek }}</td>
+                <td>{{ course.seksyen }}</td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    `,
+    data() {
+            return {
+            username: "",
+            sessemList: [],
+            groupedCourses: {},
+            selectedYear: "",
+            selectedSemester: ""
+            };
+        },
+        computed: {
+            availableYears() {
+            const years = new Set();
+            for (const key of Object.keys(this.groupedCourses)) {
+                const [year] = key.split(" - Semester ");
+                years.add(year);
+            }
+            return Array.from(years).sort().reverse();
+            },
+            filteredCourses() {
+            const filtered = {};
+            for (const [key, courses] of Object.entries(this.groupedCourses)) {
+                const [year, semester] = key.split(" - Semester ");
+                const trimmedSemester = semester.trim();
+
+                if (
+                (!this.selectedYear || this.selectedYear === year) &&
+                (!this.selectedSemester || this.selectedSemester === trimmedSemester)
+                ) {
+                filtered[key] = courses;
+                }
+            }
+            return filtered;
+            }
+        },
+        methods: {
+            async fetchData() {
+            if (!this.username) return;
+            try {
+                const response = await fetch('http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=pelajar_subjek&no_matrik=' + this.username);
+                const data = await response.json();
+                this.sessemList = data;
+                this.groupData();
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+            },
+            groupData() {
+            const grouped = {};
+            this.sessemList.forEach(item => {
+                const key = `${item.sesi} - Semester ${item.semester}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(item);
+            });
+            this.groupedCourses = grouped;
+            }
+        },
+        mounted() {
+            const storedUsername = localStorage.getItem("loggedUsername");
+            if (storedUsername) {
+            this.username = storedUsername;
+            document.getElementById("username").value = storedUsername;
+            this.fetchData();
+            } else {
+            console.error("No username found. Redirecting...");
+            window.location.replace("ttms-login.html");
+            }
+        }
+    };
+
+
+        const ProfileComponent = {
+    template: `
+        <div class="profile-container w3-card-4">
+        <div class="profile-header">
+            <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+            </div>
+            <h2>{{ full_name }}</h2>
+            <p>User Profile</p>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail-card">
+            <h4><i class="fas fa-id-card"></i> Basic Information</h4>
+            <div class="detail-item">
+                <span class="detail-label">Username:</span>
+                <span class="detail-value">{{ login_name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ email }}</span>
+            </div>
+            </div>
+
+            <div class="detail-card">
+            <h4><i class="fas fa-calendar-alt"></i> Current Semester</h4>
+            <div class="detail-item">
+                <span class="detail-label">Session-Semester:</span>
+                <span class="detail-value">{{ session_semester }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Start Date:</span>
+                <span class="detail-value">{{ start_date }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">End Date:</span>
+                <span class="detail-value">{{ end_date }}</span>
+            </div>
+            </div>
+        </div>
+        </div>
+    `,
+    data() {
+        return {
+        full_name: "Loading...",
+        login_name: "-",
+        email: "-",
+        session_semester: "Loading...",
+        start_date: "Loading...",
+        end_date: "Loading..."
+        };
+    },
+    mounted() {
+        const userData = localStorage.getItem("web.fc.utm.my_usersession");
+
+        if (userData) {
+        try {
+            const user = JSON.parse(userData);
+            this.full_name = user.full_name || "Not available";
+            this.login_name = user.login_name || "Not available";
+            this.email = user.email || "Not available";
+        } catch (e) {
+            console.error("Error parsing user data:", e);
+            alert("Error loading profile data. Please try again.");
+        }
+        } else {
+        alert("No user data found. Please login again.");
+        window.location.replace("ttms-login.html");
+        }
+
+        fetch("http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=sesisemester")
+        .then(response => response.json())
+        .then(data => {
+            const sorted = data.sort((a, b) => new Date(b.tarikh_mula) - new Date(a.tarikh_mula));
+            const current = sorted[0];
+            this.session_semester = `${current.sesi} - ${current.semester}`;
+            this.start_date = current.tarikh_mula;
+            this.end_date = current.tarikh_tamat;
+        })
+        .catch(error => {
+            console.error("Failed to fetch semester:", error);
+            this.session_semester = "Unavailable";
+            this.start_date = "Unavailable";
+            this.end_date = "Unavailable";
+        });
+    }
+    };
+
+
+    const TimetableComponent = {
+        template: `
+        <div id="myApp">
+        <h2 style="color:#80002a;">Student Timetable Viewer</h2>
+
+        <!-- Filters -->
+        <div style="margin-bottom: 20px;">
+            <label for="year">Session:</label>
+            <select v-model="selectedYear">
+            <option value="">All</option>
+            <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+            </select>
+
+            <label for="semester">Semester:</label>
+            <select v-model="selectedSemester">
+            <option value="">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            </select>
+        </div>
+
+        <div v-if="loading">Loading timetable data...</div>
+
+        <div v-else-if="Object.keys(filteredTimetables).length === 0">
+            <p>No timetable data found for the selected filters.</p>
+        </div>
+
+        <div v-else v-for="(grid, groupKey) in filteredTimetables" :key="groupKey">
+            <h3 style="color:#80002a;">{{ groupKey }}</h3>
+            <table>
+            <thead>
+                <tr>
+                <th>TIME</th>
+                <th>MON</th>
+                <th>TUE</th>
+                <th>WED</th>
+                <th>THU</th>
+                <th>FRI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(slot, index) in timeSlots" :key="index">
+                <td>{{ slot }}</td>
+                <td v-for="day in [2,3,4,5,6]" :key="day">
+                    <div v-for="entry in grid[day]?.[index+1] || []" class="class-entry">
+                    <div class="subject">{{ entry.kod_subjek }} - {{ entry.nama_subjek }}</div>
+                    <div class="location">{{ entry.ruang?.nama_ruang || 'Room N/A' }}</div>
+                    </div>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    `,
+    data() {
+        return {
+        username: "",
+        groupedTimetables: {},
+        selectedYear: "",
+        selectedSemester: "",
+        loading: true,
+        timeSlots: [
+            "8.00 - 8.50", "9.00 - 9.50", "10.00 - 10.50", "11.00 - 11.50", "12.00 - 12.50",
+            "2.00 - 2.50", "3.00 - 3.50", "4.00 - 4.50", "5.00 - 5.50"
+        ]
+        };
+    },
+    computed: {
+        availableYears() {
+        const years = new Set();
+        for (const key of Object.keys(this.groupedTimetables)) {
+            const [year] = key.split(" - Semester ");
+            years.add(year);
+        }
+        return Array.from(years).sort().reverse();
+        },
+        filteredTimetables() {
+        const filtered = {};
+        for (const [key, grid] of Object.entries(this.groupedTimetables)) {
+            const [year, sem] = key.split(" - Semester ");
+            const trimmedSem = sem.trim();
+            if (
+            (!this.selectedYear || this.selectedYear === year) &&
+            (!this.selectedSemester || this.selectedSemester === trimmedSem)
+            ) {
+            filtered[key] = grid;
+            }
+        }
+        return filtered;
+        }
+    },
+    methods: {
+        async fetchTimetables() {
+        const user = JSON.parse(localStorage.getItem("web.fc.utm.my_usersession"));
+        this.username = user?.login_name;
+
+        if (!this.username) {
+            alert("Please login first.");
+            window.location.replace("ttms-login.html");
+            return;
+        }
+
+        try {
+            const subjectRes = await fetch(`http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=pelajar_subjek&no_matrik=${this.username}`);
+            const subjects = await subjectRes.json();
+
+            const grouped = {};
+
+            for (const subject of subjects) {
+            const { sesi, semester, kod_subjek, seksyen, nama_subjek } = subject;
+            const url = `http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=jadual_subjek&sesi=${encodeURIComponent(sesi)}&semester=${semester}&kod_subjek=${kod_subjek}&seksyen=${seksyen}`;
+
+            try {
+                const res = await fetch(url);
+                const timetable = await res.json();
+
+                if (Array.isArray(timetable)) {
+                const groupKey = `${sesi} - Semester ${semester}`;
+                if (!grouped[groupKey]) grouped[groupKey] = {};
+
+                timetable.forEach(entry => {
+                    const day = entry.hari;
+                    const slot = entry.masa;
+                    entry.kod_subjek = kod_subjek;
+                    entry.nama_subjek = nama_subjek;
+
+                    if (!grouped[groupKey][day]) grouped[groupKey][day] = {};
+                    if (!grouped[groupKey][day][slot]) grouped[groupKey][day][slot] = [];
+
+                    grouped[groupKey][day][slot].push(entry);
+                });
+                }
+            } catch (err) {
+                console.warn(`Failed to fetch timetable for ${kod_subjek}`, err);
+            }
+            }
+
+            this.groupedTimetables = grouped;
+        } catch (err) {
+            console.error("Error fetching subjects", err);
+        } finally {
+            this.loading = false;
+        }
+        }
+    },
+    mounted() {
+        this.fetchTimetables();
+    }
+    };
+
+
+        // Main Vue App
+        const app = Vue.createApp({
+        components: {
+            profile: ProfileComponent,
+            timetable: TimetableComponent,
+            courses: CoursesComponent
+        },
+        data() {
+            return {
+            currentView: 'profile',
+            sidebarCollapsed: true
+            };
+        },
+        methods: {
+            toggleSidebar() {
+            this.sidebarCollapsed = !this.sidebarCollapsed;
+            },
+            logout() {
+            localStorage.removeItem("web.fc.utm.my_usersession");
+            window.location.replace("ttms-login.html");
+            }
+        }
+        });
+
+        app.mount("#app");
+    </script>
+    </body>
+    </html>

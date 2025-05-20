@@ -1,0 +1,411 @@
+ /* Main CSS */
+    .link {cursor: pointer;}
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #f1f1f1;
+      overflow-x: hidden;
+      padding-top: 20px;
+      transition: 0.5s;
+    }
+    .sidebar.collapsed { width: 60px; }
+    .sidebar.collapsed .menu-text { display: none; }
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #83103E;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .sidebar a:hover {
+      color: #83103E;
+      background-color: #ddd;
+    }
+    .sidebar a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      transition: 0.5s;
+    }
+    .main-content.expanded { margin-left: 60px; }
+    .header {
+      margin-left: 250px;
+      padding: 15px;
+      background-color: #f1f1f1;
+      transition: 0.5s;
+    }
+    .header.expanded { margin-left: 60px; }
+    .footer {
+      margin-left: 250px;
+      padding: 10px;
+      background-color: #f1f1f1;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: calc(100% - 250px);
+      transition: 0.5s;
+    }
+    .footer.expanded {
+      margin-left: 60px;
+      width: calc(100% - 60px);
+    }
+    .toggle-btn {
+      cursor: pointer;
+      font-size: 20px;
+      padding: 10px;
+      background: none;
+      border: none;
+      color: #83103E;
+    }
+    .menu-text {
+      transition: 0.3s;
+    }
+
+    /* Profile CSS */
+    .profile-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #83103E;
+        }
+        .profile-header h2 {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #83103E;
+            border: 3px solid #83103E;
+        }
+        .profile-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .detail-card {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+        }
+        .detail-card h4 {
+            color: #83103E;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .detail-value {
+            color: #333;
+        }
+        @media (max-width: 600px) {
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Courses CSS */
+     #myApp {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  #myApp label {
+    font-weight: 600;
+    margin-right: 10px;
+    color: #80002a;
+  }
+
+  #myApp select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-right: 20px;
+    background-color: #f8f8f8;
+    font-size: 14px;
+  }
+
+  #myApp table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  #myApp th, #myApp td {
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  #myApp th {
+    background-color: #80002a;
+    color: white;
+    font-weight: 600;
+  }
+
+  #myApp tr:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+
+  #myApp h2 {
+    margin-top: 30px;
+    font-size: 1.4rem;
+    color: #80002a;
+    border-bottom: 2px solid #80002a;
+    padding-bottom: 5px;
+  }
+
+  @media (max-width: 600px) {
+    #myApp table,
+    #myApp thead,
+    #myApp tbody,
+    #myApp th,
+    #myApp td,
+    #myApp tr {
+      display: block;
+    }
+
+    #myApp th, #myApp td {
+      padding: 10px;
+      border: none;
+    }
+
+    #myApp td {
+      border-bottom: 1px solid #ddd;
+    }
+
+    #myApp h2 {
+      font-size: 1.2rem;
+    }
+  }
+
+  /* Timetable CSS */
+  #myApp {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: #f4f4f4;
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    h1 {
+      color: #80002a;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #80002a;
+      border-bottom: 2px solid #80002a;
+      padding-bottom: 5px;
+      margin-top: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+      min-height: 50px;
+    }
+
+    th {
+      background-color: #80002a;
+      color: white;
+    }
+
+    td {
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    .class-entry {
+      background-color: #fdf1f4;
+      border-left: 3px solid #80002a;
+      padding: 6px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+    }
+
+    .class-entry .subject {
+      font-weight: bold;
+      color: #80002a;
+    }
+
+    .class-entry .location {
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    .filter-bar {
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-right: 15px;
+      font-size: 0.95rem;
+    }
+
+    .loading {
+      color: #999;
+    }
+
+    /* Mobile Version 
+    @media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding-top: 10px;
+  }
+
+  .sidebar.collapsed {
+    width: 100%;
+  }
+
+  .sidebar a {
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .sidebar.collapsed .menu-text {
+    display: inline;
+  }
+
+  .toggle-btn {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  .main-content,
+  .header,
+  .footer {
+    margin-left: 0 !important;
+    width: 100%;
+    padding: 15px;
+  }
+
+  .main-content.expanded,
+  .header.expanded,
+  .footer.expanded {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  .header img {
+    max-height: 40px;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .footer {
+    position: relative;
+  }
+
+  #myApp {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  #myApp label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  #myApp select {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .profile-details {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-header h2 {
+    font-size: 20px;
+  }
+
+  .detail-card h4 {
+    font-size: 16px;
+  }
+
+  .detail-label,
+  .detail-value {
+    font-size: 14px;
+  }
+
+  h2, h3 {
+    font-size: 18px;
+  }
+
+  .class-entry {
+    font-size: 13px;
+  }
+
+  .class-entry .location {
+    font-size: 12px;
+  }
+}
+*/
